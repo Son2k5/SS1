@@ -1,0 +1,44 @@
+p check:
+print("Hello, world")
+
+p1:
+name = input("What is your name? ")
+print(f"Welcome to 62FIT3SS1 class, {name}!")
+print("May the force be with you.")
+p2:
+celsius = float(input("Enter temperature in Celsius: "))
+fahrenheit = (celsius * 9/5) + 32
+print(f"The temperature in Fahrenheit is: {fahrenheit}")
+p3:
+base = float(input("base of triangle: "))
+height = float(input("height of triangle: "))
+area = 1/2 * base * height
+print(f"area of the triangle is: {area}")
+p4:
+days = int(input("Enter number of days: "))
+weeks = days // 7
+remaining_days = days % 7
+print(f"{days} days is {weeks} weeks plus {remaining_days} days")
+p5:
+
+number = int(input("Enter a number (from 0 to 999): "))
+ones = number %10
+tens = (number // 10) % 10
+hundreds = (number//100)  
+digit_sum = hundreds + tens + ones
+print(f"The sum of digits is: {digit_sum}")
+
+p6:
+
+amount = int(input("Enter an amount of money (divisible by 1000): "))
+n5000 = amount // 5000
+remainder = amount % 5000
+
+n2000 = remainder // 2000
+remainder = remainder % 2000
+
+n1000 = remainder // 1000
+
+print(f"{amount} = [ {n5000} ]*5000 + [ {n2000} ]*2000 + [ {n1000} ]*1000")
+
+
