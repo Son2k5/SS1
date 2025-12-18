@@ -1,0 +1,100 @@
+Problem 1:
+number = int(input("Enter a number: "))
+
+if number % 3 == 0 and number % 5 == 0:
+    print("fizzbuzz")
+elif number % 3 ==0:
+    print("fizz")
+elif number % 5 == 0:
+    print("buzz")
+else:
+    print(number)
+
+Problem 2: 
+def fizzBuzz():
+    user_input = input("Enter a number: ")
+
+    # Case 1: User doesn't enter a valid integer
+    if not user_input.strip() or not user_input.lstrip("-").isdigit():
+        print("Please enter a number")
+        return
+
+    number = int(user_input)
+
+    # Case 2: Negative number
+    if number < 0:
+        print("The number must be zero or positive")
+        return
+
+    # Case 3: Zero or positive number - Apply FizzBuzz rules
+    if number % 3 == 0 and number % 5 == 0:
+        print("fizzbuzz")
+    elif number % 3 == 0:
+        print("fizz")
+    elif number % 5 == 0:
+        print("buzz")
+    else:
+        print(number)
+
+Problem 3:
+def check_leap_year():
+    try:
+        # Ask user for input
+        year = int(input("Enter a year: "))
+        
+        # Check if positive
+        if year <= 0:
+            print("The number must be positive")
+            return
+
+        # Check leap year condition
+        if (year % 400 == 0) or (year % 4 == 0 and year % 100 != 0):
+            print("YES")
+        else:
+            print("NO")
+    
+    except ValueError:
+        # If input is not an integer
+        print("Enter an integer, please")
+
+
+# Run program
+check_leap_year()
+
+Problem 4:
+def gpaConverter(gpa):
+    try:
+        gpa = float(gpa)  # Try converting to number
+
+        # Check negative case
+        if gpa < 0:
+            return "Please enter a gpa score in 10-point scale"
+
+        # Map GPA according to the table
+        if 9.0 <= gpa <= 10.0:
+            return 4.0
+        elif 8.5 <= gpa < 9.0:
+            return 3.7
+        elif 8.0 <= gpa < 8.5:
+            return 3.5
+        elif 7.0 <= gpa < 8.0:
+            return 3.0
+        elif 6.0 <= gpa < 7.0:
+            return 2.5
+        elif 5.5 <= gpa < 6.0:
+            return 2.0
+        elif 5.0 <= gpa < 5.5:
+            return 1.5
+        elif 4.0 <= gpa < 5.0:
+            return 1.0
+        elif 0 <= gpa < 4.0:
+            return 0
+        else:
+            # If GPA > 10, treat it as invalid
+            return "Please enter a gpa score in 10-point scale"
+
+    except (ValueError, TypeError):
+        # If input is not a number
+        return "Please enter a gpa score in 10-point scale"
+
+    

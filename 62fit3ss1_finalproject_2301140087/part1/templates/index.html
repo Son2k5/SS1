@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book List App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            background-color: #fff;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .header h2 {
+            font-size: 24px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .actions button {
+            padding: 10px 20px;
+            font-size: 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .actions button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        #createBtn {
+            background-color: #34c759;
+            color: white;
+        }
+
+        #updateBtn {
+            background-color: #ff9500;
+            color: white;
+        }
+
+        #deleteBtn {
+            background-color: #ff3b30;
+            color: white;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border-bottom: 1px solid #f0f0f0;
+            padding: 16px 30px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #fafafa;
+            font-weight: 600;
+            color: #666;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tbody tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #007aff;
+        }
+
+        td {
+            color: #333;
+            font-size: 14px;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { 
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to { 
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 8% auto;
+            padding: 0;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            animation: slideIn 0.4s;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 25px;
+            background-color: #fafafa;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: #333;
+            font-size: 20px;
+        }
+
+        .close {
+            color: #999;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.2s;
+            line-height: 1;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .modal-body form {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .modal-body label {
+            font-weight: 500;
+            color: #555;
+            margin-bottom: 5px;
+            display: block;
+            font-size: 14px;
+        }
+
+        .modal-body input[type="text"],
+        .modal-body input[type="number"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .modal-body input[type="text"]:focus,
+        .modal-body input[type="number"]:focus {
+            outline: none;
+            border-color: #007aff;
+            box-shadow: 0 0 0 3px rgba(0,122,255,0.1);
+        }
+
+        .modal-body button {
+            width: 100%;
+            padding: 14px;
+            background-color: #007aff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .modal-body button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,122,255,0.3);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        @media (max-width: 1024px) {
+    .container {
+        margin: 10px;
+    }
+
+    th, td {
+        padding: 12px 16px;
+        font-size: 13px;
+    }
+
+    .header {
+        padding: 16px 20px;
+    }
+
+    .header h2 {
+        font-size: 20px;
+    }
+
+    .actions button {
+        padding: 8px 14px;
+        font-size: 13px;
+    }
+}
+
+    @media (max-width: 768px) {
+        body {
+            padding: 10px;
+        }
+
+        .header {
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .actions {
+            width: 80%;
+            align-items: flex-end;
+            justify-content: flex-end;
+        }
+
+        table {
+            display: block;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        th, td {
+            padding: 10px 12px;
+            font-size: 12px;
+        }
+
+        input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+        }
+
+        .modal-content {
+            width: 95%;
+            margin: 15% auto;
+        }
+
+        .modal-header h3 {
+            font-size: 18px;
+        }
+
+        .modal-body button {
+            font-size: 15px;
+            padding: 12px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .header h2 {
+            font-size: 15px;
+        }
+        .header {
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .actions {
+            width: 80%;
+            align-items: flex-end;
+            justify-content: flex-end;
+        }
+
+        .actions {
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .actions button {
+            width: 80%;
+        }
+
+        th, td {
+            font-size: 11px;
+            padding: 8px 10px;
+        }
+
+        .modal-body input[type="text"],
+        .modal-body input[type="number"] {
+            font-size: 13px;
+            padding: 10px;
+        }
+
+        .modal-body label {
+            font-size: 13px;
+        }
+    }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>BOOK LIST</h2>
+            <div class="actions">
+                <button type="button" id="createBtn">Create</button>
+                <button type="button" id="updateBtn">Update</button>
+                <button type="button" id="deleteBtn">Delete</button>
+            </div>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 50px;"></th>
+                    <th>Genre</th>
+                    <th>Book Title</th>
+                    <th>Author</th>
+                    <th>Publication Year</th>
+                    <th>Publisher</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for book in bookList %}
+                <tr>
+                    <td>
+                        <input type="checkbox" name="selected_id" value="{{ book.id }}" 
+                               data-genre="{{ book.genre }}"
+                               data-title="{{ book.title }}"
+                               data-author="{{ book.author }}"
+                               data-year="{{ book.year }}"
+                               data-publisher="{{ book.publisher }}">
+                    </td>
+                    <td>{{ book.genre }}</td>
+                    <td>{{ book.title }}</td>
+                    <td>{{ book.author }}</td>
+                    <td>{{ book.year }}</td>
+                    <td>{{ book.publisher }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Create Modal -->
+    <div id="createModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create New Book</h3>
+                <span class="close" onclick="closeModal('createModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="/create">
+                    <div class="form-group">
+                        <label for="createGenre">Genre:</label>
+                        <input type="text" id="createGenre" name="genre" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="createTitle">Book Title:</label>
+                        <input type="text" id="createTitle" name="title" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="createAuthor">Author:</label>
+                        <input type="text" id="createAuthor" name="author" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="createYear">Publication Year:</label>
+                        <input type="number" id="createYear" name="year" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="createPublisher">Publisher:</label>
+                        <input type="text" id="createPublisher" name="publisher" required>
+                    </div>
+                    
+                    <button type="submit">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Modal -->
+    <div id="updateModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Update Book</h3>
+                <span class="close" onclick="closeModal('updateModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="/update">
+                    <input type="hidden" id="updateId" name="id">
+                    
+                    <div class="form-group">
+                        <label for="updateGenre">Genre:</label>
+                        <input type="text" id="updateGenre" name="genre" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="updateTitle">Book Title:</label>
+                        <input type="text" id="updateTitle" name="title" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="updateAuthor">Author:</label>
+                        <input type="text" id="updateAuthor" name="author" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="updateYear">Publication Year:</label>
+                        <input type="number" id="updateYear" name="year" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="updatePublisher">Publisher:</label>
+                        <input type="text" id="updatePublisher" name="publisher" required>
+                    </div>
+                    
+                    <button type="submit">Submit Update</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Form (hidden) -->
+    <form id="deleteForm" method="POST" action="/delete" style="display: none;">
+        <input type="hidden" id="deleteId" name="id">
+    </form>
+
+    <script>
+        const checkboxeValues = document.querySelectorAll('input[name="selected_id"]');
+        checkboxeValues.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    checkboxes.forEach(cb => {
+                        if (cb !== this) cb.checked = false;
+                    });
+                }
+            });
+        });
+
+        // Create button
+        document.getElementById('createBtn').addEventListener('click', function() {
+            document.getElementById('createModal').style.display = 'block';
+        });
+
+        // Update button
+        document.getElementById('updateBtn').addEventListener('click', function() {
+            const selected = document.querySelector('input[name="selected_id"]:checked');
+            if (!selected) {
+                alert('Please select a book to update.');
+                return;
+            }
+
+            document.getElementById('updateId').value = selected.value;
+            document.getElementById('updateGenre').value = selected.dataset.genre;
+            document.getElementById('updateTitle').value = selected.dataset.title;
+            document.getElementById('updateAuthor').value = selected.dataset.author;
+            document.getElementById('updateYear').value = selected.dataset.year;
+            document.getElementById('updatePublisher').value = selected.dataset.publisher;
+
+            document.getElementById('updateModal').style.display = 'block';
+        });
+
+        // Delete button
+        document.getElementById('deleteBtn').addEventListener('click', function() {
+            const selected = document.querySelector('input[name="selected_id"]:checked');
+            if (!selected) {
+                alert('Please select a book to delete.');
+                return;
+            }
+
+            if (confirm('Are you sure you want to delete this book?')) {
+                document.getElementById('deleteId').value = selected.value;
+                document.getElementById('deleteForm').submit();
+            }
+        });
+
+        // Close modal function
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Click outside modal to close
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
