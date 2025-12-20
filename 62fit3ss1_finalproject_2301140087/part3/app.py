@@ -8,14 +8,14 @@ app = Flask(__name__)
 DATABASE = 'booklist3.db'
 
 
-def get_db_getConnectionection():
+def get_db_connection():
     getConnection = sqlite3.connect(DATABASE)
     getConnection.row_factory = sqlite3.Row  
     return getConnection
 
 
 def init_db():
-    getConnection = get_db_getConnectionection()
+    getConnection = get_db_connection()
     cursor = getConnection.cursor()
     
     cursor.execute("""
@@ -65,7 +65,7 @@ def create_book_web():
     yearValue = int(request.form.get('year'))
     publisherValue = request.form.get('publisher')
     
-    getConnection = get_db_getConnectionection()
+    getConnection = get_db_connection()
     cursor = getConnection.cursor()
     cursor.execute("""
         INSERT INTO book (genre, title, author, year, publisher)
@@ -87,7 +87,7 @@ def update_book_web():
     yearValue = int(request.form.get('year'))
     publisherValue = request.form.get('publisher')
     
-    getConnection = get_db_getConnectionection()
+    getConnection = get_db_connection()
     cursor = getConnection.cursor()
     cursor.execute("""
         UPDATE book 
@@ -106,7 +106,7 @@ def delete_book_web():
     selected_id_values = request.form.getlist('ids')
     
     if selected_id_values:
-        getConnection = get_db_getConnectionection()
+        getConnection = get_db_connection()
         cursor = getConnection.cursor()
         
         placeholders = ','.join('?' * len(selected_id_values))
@@ -123,7 +123,7 @@ def delete_book_web():
 @app.route('/api/list', methods=['GET'])
 def api_list_books():
     try:
-        getConnection = get_db_getConnectionection()
+        getConnection = get_db_connection()
         cursor = getConnection.cursor()
         cursor.execute("SELECT * FROM book ORDER BY id")
         books = cursor.fetchall()
@@ -152,7 +152,7 @@ def api_add_book():
         year = int(data['year'])
         publisher = data['publisher']
         
-        getConnection = get_db_getConnectionection()
+        getConnection = get_db_connection()
         cursor = getConnection.cursor()
         cursor.execute("""
             INSERT INTO book (genre, title, author, year, publisher)
@@ -196,7 +196,7 @@ def api_update_book():
         yearValue = int(data['year'])
         publisherValue = data['publisher']
         
-        getConnection = get_db_getConnectionection()
+        getConnection = get_db_connection()
         cursor = getConnection.cursor()
         
         cursor.execute("SELECT id FROM book WHERE id = ?", (book_id,))
@@ -227,7 +227,7 @@ def api_update_book():
 @app.route('/api/delete', methods=['GET', 'POST'])
 def api_delete_book():
     try:
-        getConnection = get_db_getConnectionection()
+        getConnection = get_db_connection()
         cursor = getConnection.cursor()
         
         if request.method == 'GET':
