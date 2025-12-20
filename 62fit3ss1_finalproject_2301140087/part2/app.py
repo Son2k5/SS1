@@ -8,9 +8,9 @@ DATABASE = 'booklist2.db'
 
 
 def get_db_connection():
-    connection = sqlite3.connect(DATABASE)
-    connection.row_factory = sqlite3.Row  
-    return connection
+    conn = sqlite3.connect(DATABASE)
+    conn.row_factory = sqlite3.Row  
+    return conn
 
 
 def init_db():
@@ -29,10 +29,10 @@ def init_db():
     """)
     
     cursor.execute("SELECT COUNT(*) FROM book")
-    countValue = cursor.fetchone()[0]
+    count = cursor.fetchone()[0]
     
-    if countValue == 0:
-        sample_books = [
+    if count == 0:
+        sample_book_values = [
             ('Fiction', 'To Kill a Mockingbird', 'Harper Lee', 2007, 'J.B. Lippincott & Co.'),
             ('Fiction', 'Sapiens: A Brief History of Humankind', 'Yuval Noah Harari', 2014, 'Harper'),
             ('Fiction', '1984', 'George Orwell', 2000, 'Secker & Warburg')
@@ -41,7 +41,7 @@ def init_db():
         cursor.executemany("""
             INSERT INTO book (genre, title, author, year, publisher)
             VALUES (?, ?, ?, ?, ?)
-        """, sample_books)
+        """, sample_book_values)
         getConnection.commit()
         print("Database initialized with sample data.")
     
@@ -85,42 +85,45 @@ def create_book():
 
 @app.route('/update', methods=['POST'])
 def update_book():
-    book_id = int(request.form.get('id'))
+    book_id_value = int(request.form.get('id'))
     genreValue = request.form.get('genre')
     titleValue = request.form.get('title')
     authorValue = request.form.get('author')
     yearValue = int(request.form.get('year'))
     publisherValue = request.form.get('publisher')
     
-    conn = get_db_connection()
-    cursor = conn.cursor()
+    getConnection = get_db_connection()
+    cursor = getConnection.cursor()
     cursor.execute("""
         UPDATE book 
         SET genre = ?, title = ?, author = ?, year = ?, publisher = ?
         WHERE id = ?
-    """, (genreValue, titleValue, authorValue, yearValue, publisherValue, book_id))
+    """, (genreValue, titleValue, authorValue, yearValue, publisherValue, book_id_value))
     
-    conn.commit()
-    conn.close()
+    getConnection.commit()
+    getConnection.close()
     
     return redirect(url_for('index'))
 
 
 @app.route('/delete', methods=['POST'])
 def delete_book():
-    book_id = int(request.form.get('id'))
+    selected_id_values = request.form.getlist('ids')
     
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM book WHERE id = ?", (book_id,))
-    
-    conn.commit()
-    conn.close()
+    if selected_id_values:
+        getConnection = get_db_connection()
+        cursor = getConnection.cursor()
+        
+        placeholders = ','.join('?' * len(selected_id_values))
+        query = f"DELETE FROM book WHERE id IN ({placeholders})"
+        cursor.execute(query, selected_id_values)
+        
+        getConnection.commit()
+        getConnection.close()
     
     return redirect(url_for('index'))
 
 
 if __name__ == '__main__':
-
     init_db()
     app.run(debug=True)

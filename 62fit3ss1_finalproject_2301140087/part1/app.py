@@ -2,7 +2,6 @@ from flask import Flask, render_template, request, redirect, url_for
 
 app = Flask(__name__)
 
-
 bookList = [
     {'id': 1, 'genre': 'Fiction', 'title': 'To Kill a Mockingbird', 'author': 'Harper Lee',
      'year': 2007, 'publisher': 'J.B. Lippincott & Co.'},
@@ -12,7 +11,7 @@ bookList = [
      'publisher': 'Secker & Warburg'}
 ]
 
-NextIDValue= 4
+next_id_Value = 4
 
 
 @app.route('/')
@@ -22,10 +21,10 @@ def index():
 
 @app.route('/create', methods=['POST'])
 def create_book():
-    global NextIDValue
+    global next_id_Value
     
     new_book_value = {
-        'id': NextIDValue,
+        'id': next_id_Value,
         'genre': request.form.get('genre'),
         'title': request.form.get('title'),
         'author': request.form.get('author'),
@@ -33,26 +32,22 @@ def create_book():
         'publisher': request.form.get('publisher')
     }
     bookList.append(new_book_value)
-    NextIDValue += 1
+    next_id_Value += 1
     return redirect(url_for('index'))
 
 
 @app.route('/update', methods=['POST'])
 def update_book():
-    book_id_value = int(request.form.get('id'))
+    book_id = int(request.form['id'])
 
-    bookValue = None
     for book in bookList:
-        if book['id'] == book_id_value:
-            bookValue = book
+        if book['id'] == book_id:
+            book['genre'] = request.form['genre']
+            book['title'] = request.form['title']
+            book['author'] = request.form['author']
+            book['year'] = int(request.form['year'])
+            book['publisher'] = request.form['publisher']
             break
-
-    if bookValue is not None:
-        bookValue['genre'] = request.form.get('genre')
-        bookValue['title'] = request.form.get('title')
-        bookValue['author'] = request.form.get('author')
-        bookValue['year'] = int(request.form.get('year'))
-        bookValue['publisher'] = request.form.get('publisher')
 
     return redirect(url_for('index'))
 
@@ -60,15 +55,13 @@ def update_book():
 
 @app.route('/delete', methods=['POST'])
 def delete_book():
-    book_id = int(request.form.get('id'))
-
-    for book in bookList:
-        if book['id'] == book_id:
-            bookList.remove(book)
-            break
-
+    global bookList
+    selected_id_Values = request.form.getlist('ids')
+    if selected_id_Values:
+        ids_to_delete = [int(id) for id in selected_id_Values]
+        bookList = [b for b in bookList if b['id'] not in ids_to_delete]
+    
     return redirect(url_for('index'))
-
 
 
 if __name__ == '__main__':
